@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, Column, String, Integer, DateTime
 import pandas as pd
 from table_struct import *
 from sql_reading import *
+
 ModelBase = declarative_base()  # <-基类
 
 
@@ -21,72 +22,89 @@ ModelBase = declarative_base()  # <-基类
 # autoincrement（布尔值）：指定是否自动递增。
 
 
-HOSTNAME = '10.7.71.112'
-PORT = '3306'
-DATABASE = 'sqlalchemy'
-USERNAME = 'atl-aps'
-PASSWORD = 'atl-aps'
+HOSTNAME = "10.7.71.112"
+PORT = "3306"
+DATABASE = "sqlalchemy"
+USERNAME = "atl-aps"
+PASSWORD = "atl-aps"
 
 # 创建数据库引擎
-_url =  "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8".format(
-    username=USERNAME, password=PASSWORD, host=HOSTNAME, port=PORT, db=DATABASE)
+_url = "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8".format(
+    username=USERNAME, password=PASSWORD, host=HOSTNAME, port=PORT, db=DATABASE
+)
 engine = create_engine(_url)
+
 
 def get_session():
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
 
+
 # # 创建会话工厂
 # Session = sessionmaker(bind=engine)
 # # 创建会话
 # session = Session()
 with get_session() as session:
+
     try:
-        result = session.query(AuthUser).with_entities(AuthUser.username).filter(AuthUser.username == 'Alic1e')
-        a = pd.read_sql(result.statement, session.bind)
-        print(result)
-        print(a)
-        # result1 = session.query(TestTable).filter(TestTable.column1 =='1')
-        # b= pd.read_sql(result1.statement, session.bind)
-        # print(result1)
-        # print(b)
-        cols = ['factory_name', 'pack', 'product_name', 'old_month', 'merge_month',
-                'merge_quantity']
-        User = aliased(ConfigMergeProductDemand)
-        # result2 = session.query(User).with_entities(*[getattr(User, i) for i in cols]).filter(User.version_id == '9c8c27fa-0228-4ed8-9b95-5004808be58d')
-        result2 = session.query(User).filter(User.version_id.in_(['9c8c27fa-0228-4ed8-9b95-5004808be58d']))
-        c = pd.read_sql(result2.statement, session.bind)
-        print(result2)
-        print(c)
+        #
+        # # 添加数据
+        user1 = AuthUser(username="Alic1e", password=25)
+        # user2 = AuthUser(username='Bob1', password=30)
+        query = session.query(AuthUser).get(user1.username)
+        session.merge(user1)
+        # session.add(user2)
+        session.commit()
+
+        # TmpObj = OptServiceParameter
+
+        # if 'result_daily_newly_purchased_tool_cost' not in inspect(engine).get_table_names():
+        #     TmpObj.__table__.create(engine)
+
+        # query = session.query(TmpObj).with_entities(TmpObj)
+        #
+        # obj_df = pd.read_sql(query.statement, session.bind)
+        # tmp = obj_df['algorithm_params'].values[1]
+        # result = session.query(AuthUser).with_entities(AuthUser.username).filter(AuthUser.username == 'Alic1e')
+        # a = pd.read_sql(result.statement, session.bind)
+        # print(result)
+        # print(a)
+        # # result1 = session.query(TestTable).filter(TestTable.column1 =='1')
+        # # b= pd.read_sql(result1.statement, session.bind)
+        # # print(result1)
+        # # print(b)
+        # cols = ['factory_name', 'pack', 'product_name', 'old_month', 'merge_month',
+        #         'merge_quantity']
+        # User = aliased(ConfigMergeProductDemand)
+        # # result2 = session.query(User).with_entities(*[getattr(User, i) for i in cols]).filter(User.version_id == '9c8c27fa-0228-4ed8-9b95-5004808be58d')
+        # result2 = session.query(User).filter(User.version_id.in_(['9c8c27fa-0228-4ed8-9b95-5004808be58d']))
+        # c = pd.read_sql(result2.statement, session.bind)
+        # print(result2)
+        # print(c)
+        print("ttt")
     except Exception as e:
         session.rollback()  # 回滚事务
         print(f"An error occurred: {str(e)}")
     finally:
         session.close()
 
-# 添加数据
-user1 = AuthUser(username='Alic1e', password=25)
-user2 = AuthUser(username='Bob1', password=30)
-session.add(user1)
-session.add(user2)
-session.commit()
-
-# 查询数据
-users = session.query(AuthUser).all()
-for user in users:
-    print(user)
-
-# 更新数据
-user1.password = 26
-session.commit()
-
-# 删除数据
-session.delete(user2)
-session.commit()
-
-# 关闭会话
-session.close()
+#
+# # 查询数据
+# users = session.query(AuthUser).all()
+# for user in users:
+#     print(user)
+#
+# # 更新数据
+# user1.password = 26
+# session.commit()
+#
+# # 删除数据
+# session.delete(user2)
+# session.commit()
+#
+# # 关闭会话
+# session.close()
 
 
 # MySQL-Python

@@ -4,6 +4,8 @@ import logging
 import re
 import json
 
+# 依据 table_struct 自动生成 table_setting json
+
 
 def get_all_class_in_file(file):
     """
@@ -29,6 +31,8 @@ def get_all_class_in_file(file):
 
 
 def get_sheet_name(name):
+    # if '结果模块' in name:
+    #     return name
     pattern = r"(\d+\.\d+)"
     match = re.search(pattern, name)
 
@@ -59,7 +63,9 @@ for cls in classes:
         if not sheet_name:
             continue
     except Exception as e:
-        raise Exception(e)
+        print(cls.__name__)
+        exit(-1)
+
     if not sheet_name:
         print("****** {} no sheet name ******".format(cls.__name__))
         continue
@@ -74,14 +80,14 @@ for cls in classes:
             _error = "表格{} 的字段 {} 缺少注释".format(sheet_name, col_name)
             error_info.append(_error)
         # get some common filter
-        if col_name == "valid":
+        if col_name == "valid" or col_name == "VALID":
             _filter[col_name] = "YES"
-        if col_name == "version_id":
+        if col_name == "version_id" or col_name == "VERSION_ID":
             _filter[col_name] = "version_id"
-        if col_name == "analysis_id":
+        if col_name == "analysis_id" or col_name == "ANALYSIS_ID":
             _filter[col_name] = "analysis_id"
         # remove some common column that is useless
-        if col_name in [
+        if str(col_name).lower() in [
             "id",
             "creator",
             "creator_name",
@@ -98,25 +104,33 @@ for cls in classes:
             continue
 
         cols[col_name] = col_comment
+        # cols[col_comment] = col_name
     # if same sheet name, output log
     while sheet_name in mapping:
         sheet_name += "_1"
         print("******error for sheet name {} ******".format(sheet_name))
-    mapping[sheet_name] = {"table_obj": table_obj, "cols": cols, "filter": _filter}
+    mapping[sheet_name] = {
+        "table_obj": table_obj,
+        "cols": cols,
+        "filter_equal": _filter,
+    }
+
+    # mapping[cls.__tablename__] = {"table_obj": table_obj, "cols": cols,
+    #                               "filter_equal": _filter,
+    #                               'sheet_name':sheet_name}
 
     print(sheet_name, table_obj)
 
 if error_info:
-    print('--------------------------')
+    print("--------------------------")
     tmp = "\n".join(error_info)
     print(tmp)
-    raise Exception(tmp)
+    # raise Exception(tmp)
 
 # sorted by sheet name
 mapping = {k: mapping[k] for k in sorted(mapping)}
-
 # output json file
-with open("mapping.json", "w") as wl:
+with open("mapping_pro.json", "w", encoding="utf-8") as wl:
     json.dump(
         {str(k): mapping[k] for k in mapping},
         wl,
