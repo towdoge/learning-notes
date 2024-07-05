@@ -1,0 +1,12 @@
+# ignore the idea folder from pycharm
+.idea/
+.idea/*
+__pycache__/
+__pycache__/*
+*.csv
+*.txt
+*.log
+*.lp
+*.xlsm
+*.xlsx
+*.bak
