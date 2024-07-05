@@ -9,9 +9,9 @@ def scp_file(analysis_id):
     :return:
     """
 
-    source_hostname = "172.24.19.11"
+    source_hostname = "1.1.1.1"
     source_username = "root"
-    source_password = "atl123456"
+    source_password = "root"
 
     local_folder = "/opt/workdir/atl/{}".format(analysis_id)
     remote_folder = "/opt/workdir/bak/{}".format(analysis_id)

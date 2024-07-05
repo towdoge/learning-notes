@@ -5,7 +5,7 @@ import pandas as pd
 
 # set global split str
 SPLIT_STR = "\\" if "win" in platform else "/"
-cols = ["path", "file", "function", "start_line", "args_num", "lines"]
+cols = ["path", "file", "function", "start_line", "args_num", "lines","doc","whether_called"]
 df_list = []
 
 
@@ -24,8 +24,16 @@ def get_lines(file_path):
             if not isinstance(node, ast.FunctionDef):
                 continue
             name, start_line, lines, args_num = count_lines(node)
-            df_list.append([file_path, file_name, name, start_line, args_num, lines])
+            docstring = ast.get_docstring(node, clean=False)
+            whether_doc = docstring is not None
+            whether_called = False
+            for sub_node in ast.walk(node):
+                if isinstance(sub_node, ast.Call) and isinstance(sub_node.func,
+                                                                 ast.Name) and sub_node.func.id == name:
+                    whether_called = True
+                    break
 
+            df_list.append([file_path, file_name, name, start_line, args_num, lines, whether_doc,whether_called])
 
 def get_lines_for_all_files(work_dir):
     import numpy as np
@@ -40,10 +48,11 @@ def get_lines_for_all_files(work_dir):
 
 
 if __name__ == "__main__":
-    work_dir = "D:\\git\\atl_aps_2021"
+    work_dir = "D:\\git\\test"
     get_lines_for_all_files(work_dir)
     if not df_list:
         print("no py file or no function")
     else:
         df = pd.DataFrame(df_list, columns=cols)
         df.to_csv("function_lines.csv", encoding="utf-8-sig", index=False)
+        print(os.getcwd())

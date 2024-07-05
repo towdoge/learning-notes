@@ -27,6 +27,15 @@ print(file_name)
 
 model = gb.gurobi.read(file_name)
 model.optimize()
+print(model.status)
+
+model.computeIIS()
+print('ttt')
+model.write("infeasible.ilp")
+print('ttt')
+
 if model.Status == gb.GRB.INFEASIBLE:
     model.computeIIS()
+    print('ttt')
     model.write("infeasible.ilp")
+    print('ttt')

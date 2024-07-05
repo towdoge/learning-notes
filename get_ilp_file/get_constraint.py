@@ -16,16 +16,17 @@ file_name = file_names[-1]
 print(work_dir)
 print(file_name)
 
-constraint_names = set()
+constraint_names = []
 with open(file_name, "r", encoding="utf-8") as file:
     lines = file.readlines()
     for line in lines:
         try:
             if ":" == line.strip()[-1]:
                 row = line.strip().split("(")[0]
-                constraint_names.add(row)
+                if row not in constraint_names:
+                    constraint_names.append(row)
         except:
             print("------{}".format(line))
-    constraint_names = sorted(constraint_names)
+    # constraint_names = sorted(constraint_names)
 for i in constraint_names:
     print(i)
