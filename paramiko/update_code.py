@@ -15,10 +15,10 @@ pro_servers = [
         "jump_username": "root",
         "jump_password": "root",
     },
-    {"ip": "1.1.1.3",, "port": 22, "username": "root", "password": "root"},
+    {"ip": "1.1.1.3", "port": 22, "username": "root", "password": "root"},
 ]
 uat_servers = [
-    {"ip": "1.1.1.4",, "port": 22, "username": "root", "password": "root"},
+    {"ip": "1.1.1.4", "port": 22, "username": "root", "password": "root"},
 ]
 
 # 工作目录和命令
@@ -26,7 +26,7 @@ workdir = "/opt/workdir/server"
 get_uwsgi_pid = f"cat {workdir}/uwsgi.pid"
 git_fetch = f"cd {workdir} && git fetch"
 git_commands = f"cd {workdir} && git pull"
-check_uwsgi_command = "ps -ef | grep 'uwsgi' | grep -v grep | awk '{print $2, $3, $9}'"
+check_uwsgi_command = "ps -ef | grep 'uwsgi' | grep -v grep | awk '{print}'"
 uwsgi_reload_command = f"uwsgi --reload {workdir}/uwsgi.pid"
 
 
@@ -132,7 +132,7 @@ def main(env="pro"):
                 continue
             flag = False
             list_uwsgi = output.split("\n")
-            print(list_uwsgi)
+            # print(list_uwsgi)
             for k in list_uwsgi:
                 if k == "":
                     continue
