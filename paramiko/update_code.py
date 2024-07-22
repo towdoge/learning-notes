@@ -21,15 +21,6 @@ uat_servers = [
     {"ip": "1.1.1.4", "port": 22, "username": "root", "password": "root"},
 ]
 
-# 工作目录和命令
-workdir = "/opt/workdir/server"
-get_uwsgi_pid = f"cat {workdir}/uwsgi.pid"
-git_fetch = f"cd {workdir} && git fetch"
-git_commands = f"cd {workdir} && git pull"
-check_uwsgi_command = "ps -ef | grep 'uwsgi' | grep -v grep | awk '{print}'"
-uwsgi_reload_command = f"uwsgi --reload {workdir}/uwsgi.pid"
-
-
 def ssh_connect(
     ip,
     port,
@@ -98,9 +89,19 @@ def execute_command(ssh=None, command=""):
             return e.stdout, e.stderr
 
 
-def main(env="pro"):
+def main(env="pro", branch=""):
     servers = pro_servers if env == "pro" else uat_servers
+    # 工作目录和命令
+
     for server in servers:
+        workdir = server.get("workdir", "/opt/workdir/server")
+        git_checkout = f"cd {workdir} && git checkout {branch}"
+        get_uwsgi_pid = f"cat {workdir}/uwsgi.pid"
+        git_fetch = f"cd {workdir} && git fetch"
+        git_pull = f"cd {workdir} && git pull"
+        git_rev = f"cd {workdir} && git rev-parse HEAD"
+        check_uwsgi_command = "ps -ef | grep 'uwsgi' | grep -v grep | awk '{print}'"
+        uwsgi_reload_command = f"uwsgi --reload {workdir}/uwsgi.pid"
         print(f"正在处理服务器：{server['ip']}")
         ssh = ssh_connect(
             server["ip"],
@@ -117,14 +118,20 @@ def main(env="pro"):
             uwsgi_pid = output.split("\n")[0]
             # 执行git fetch 和 git pull
             output, error = execute_command(ssh, git_fetch)
+
+            if branch:
+                output, error = execute_command(ssh, git_checkout)
+                print("切换到分支: {}".format(branch))
             # if error:
             # print(f"Git fetch 操作失败: {error}")
             # continue
-            output, error = execute_command(ssh, git_commands)
+            output, error = execute_command(ssh, git_pull)
             if error:
                 print(f"Git pull 操作失败: {error}")
                 continue
 
+            output, error = execute_command(ssh, git_rev)
+            print("当前commit id {}".format(output))
             # 检查uwsgi是否在运行算法
             output, error = execute_command(ssh, check_uwsgi_command)
             if error:
@@ -136,12 +143,13 @@ def main(env="pro"):
             for k in list_uwsgi:
                 if k == "":
                     continue
-                print("pid {}".format(k))
                 if any(["defunct" in id for id in k.split(" ")]):
+                    print("defunct pid {}".format(k))
                     continue
                 if any([id == uwsgi_pid for id in k.split(" ")]):
                     continue
                 else:
+                    print("processing pid {}".format(k))
                     flag = True
                     break
             if flag:
@@ -160,5 +168,6 @@ def main(env="pro"):
 
 
 if __name__ == "__main__":
-    env = "pro" if len(sys.argv) <= 2 else sys.argv[2]
-    main(env)
+    env = "pro" if len(sys.argv) <= 1 else sys.argv[1]
+    branch = "" if len(sys.argv) <= 2 else sys.argv[2]
+    main(env, branch)
