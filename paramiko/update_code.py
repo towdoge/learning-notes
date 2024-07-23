@@ -96,7 +96,8 @@ def main(env="pro", branch=""):
     for server in servers:
         workdir = server.get("workdir", "/opt/workdir/server")
         git_checkout = f"cd {workdir} && git checkout {branch}"
-        get_uwsgi_pid = f"cat {workdir}/uwsgi.pid"
+        get_uwsgi_pid1 = "cat /opt/workdir/server/uwsgi.pid"
+        get_uwsgi_pid2 = "cat /opt/produce_workdir/server/uwsgi.pid"
         git_fetch = f"cd {workdir} && git fetch"
         git_pull = f"cd {workdir} && git pull"
         git_rev = f"cd {workdir} && git rev-parse HEAD"
@@ -114,17 +115,22 @@ def main(env="pro", branch=""):
             server.get("jump_password"),
         )
         try:
-            output, error = execute_command(ssh, get_uwsgi_pid)
+            # there will be more than one uwsgi server
+            uwsgi_pids = []
+            output, error = execute_command(ssh, get_uwsgi_pid1)
             uwsgi_pid = output.split("\n")[0]
+            uwsgi_pids.append(uwsgi_pid)
+            output, error = execute_command(ssh, get_uwsgi_pid2)
+            uwsgi_pid = output.split("\n")[0]
+            uwsgi_pids.append(uwsgi_pid)
+
             # 执行git fetch 和 git pull
             output, error = execute_command(ssh, git_fetch)
 
             if branch:
                 output, error = execute_command(ssh, git_checkout)
                 print("切换到分支: {}".format(branch))
-            # if error:
-            # print(f"Git fetch 操作失败: {error}")
-            # continue
+
             output, error = execute_command(ssh, git_pull)
             if error:
                 print(f"Git pull 操作失败: {error}")
@@ -132,36 +138,39 @@ def main(env="pro", branch=""):
 
             output, error = execute_command(ssh, git_rev)
             print("当前commit id {}".format(output))
+
             # 检查uwsgi是否在运行算法
             output, error = execute_command(ssh, check_uwsgi_command)
             if error:
                 print("查询失败，尝试重新加载...")
                 continue
-            flag = False
+            existed = False
             list_uwsgi = output.split("\n")
-            # print(list_uwsgi)
+
             for k in list_uwsgi:
                 if k == "":
                     continue
-                if any(["defunct" in id for id in k.split(" ")]):
+                # if it is defunct process
+                elif any(["defunct" in id for id in k.split(" ")]):
                     print("defunct pid {}".format(k))
                     continue
-                if any([id == uwsgi_pid for id in k.split(" ")]):
+                # if it is server process
+                elif any([id in uwsgi_pids for id in k.split(" ")]):
                     continue
                 else:
                     print("processing pid {}".format(k))
-                    flag = True
+                    existed = True
                     break
-            if flag:
-                print("uwsgi正在运行算法，稍等...")
+            if existed:
+                print("uwsgi正在运行算法，稍等...\n")
                 continue
             else:
                 output, error = execute_command(ssh, uwsgi_reload_command)
                 if error:
-                    print("uwsgi更新失败...")
+                    print("uwsgi更新失败...\n")
                     continue
                 else:
-                    print("uwsgi更新成功...")
+                    print("uwsgi更新成功...\n")
         finally:
             if ssh:
                 ssh.close()
