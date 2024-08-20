@@ -25,8 +25,8 @@ ModelBase = declarative_base()  # <-基类
 HOSTNAME = "10.7.71.112"
 PORT = "3306"
 DATABASE = "sqlalchemy"
-USERNAME = "atl-aps"
-PASSWORD = "atl-aps"
+USERNAME = "xxx"
+PASSWORD = "xxx"
 
 # 创建数据库引擎
 _url = "mysql+pymysql://{username}:{password}@{host}:{port}/{db}?charset=utf8".format(

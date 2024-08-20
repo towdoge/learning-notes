@@ -3,8 +3,8 @@ import os
 
 HOSTNAME = "10.7.71.112"
 PORT = "3306"
-USERNAME = "root"
-PASSWORD = "root"
+USERNAME = "xx"
+PASSWORD = "xx"
 DATABASE = "sqlalchemy"
 
 # 创建数据库引擎

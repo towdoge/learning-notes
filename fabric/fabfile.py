@@ -29,8 +29,8 @@ def run_shell(conn, cmd, hide=True, warn=True, encoding='utf-8'):
 
 def do_it():
     host = '10.7.71.112'
-    user = 'root'
-    password = 'root'
+    user = 'xx'
+    password = 'xx'
 
     # ssh 连接的正确姿势
     conn = Connection(host=host, user=user, connect_kwargs={'password': password})

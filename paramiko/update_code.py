@@ -6,19 +6,97 @@ import subprocess
 # 定义服务器信息
 pro_servers = [
     {
-        "ip": "1.1.1.1",
+        "ip": "172.23.8.130",
         "port": 22,
         "username": "root",
-        "password": "root",
-        "jump_ip": "1.1.1.2",
+        "password": "Atl-2019",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
         "jump_port": 22,
         "jump_username": "root",
-        "jump_password": "root",
+        "jump_password": "Atl-2019",
     },
-    {"ip": "1.1.1.3", "port": 22, "username": "root", "password": "root"},
+    {
+        "ip": "172.23.8.131",
+        "port": 22,
+        "username": "root",
+        "password": "Atl-2019",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    }, {
+        "ip": "172.23.8.197",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/produce_workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    },{
+        "ip": "172.23.8.198",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    }, {
+        "ip": "172.23.8.199",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    }, {
+        "ip": "172.23.8.200",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    }, {
+        "ip": "10.17.170.82",
+        "port": 22,
+        "username": "root",
+        "password": "Atl-2019",
+        "workdir": "/opt/workdir/server",
+    },
 ]
 uat_servers = [
-    {"ip": "1.1.1.4", "port": 22, "username": "root", "password": "root"},
+    {
+        "ip": "172.23.8.196",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    },
+    {
+        "ip": "172.23.8.197",
+        "port": 22,
+        "username": "root",
+        "password": "atl123456",
+        "workdir": "/opt/workdir/server",
+        "jump_ip": "172.23.11.206",
+        "jump_port": 22,
+        "jump_username": "root",
+        "jump_password": "Atl-2019",
+    },
 ]
 
 def ssh_connect(
@@ -30,7 +108,7 @@ def ssh_connect(
     jump_port=None,
     jump_username=None,
     jump_password=None,
-    local_ip="1.1.1.1",
+    local_ip="10.17.170.82",
 ):
     # 创建SSH对象
     ssh = paramiko.SSHClient()
@@ -99,6 +177,8 @@ def main(env="pro", branch=""):
         get_uwsgi_pid1 = "cat /opt/workdir/server/uwsgi.pid"
         get_uwsgi_pid2 = "cat /opt/produce_workdir/server/uwsgi.pid"
         git_fetch = f"cd {workdir} && git fetch"
+        git_stash = f"cd {workdir} && git stash"
+        git_stash_pop = f"cd {workdir} && git stash pop"
         git_pull = f"cd {workdir} && git pull"
         git_rev = f"cd {workdir} && git rev-parse HEAD"
         check_uwsgi_command = "ps -ef | grep 'uwsgi' | grep -v grep | awk '{print}'"
@@ -137,7 +217,7 @@ def main(env="pro", branch=""):
                 continue
 
             output, error = execute_command(ssh, git_rev)
-            print("当前commit id {}".format(output))
+            print("当前commit id {}".format(str(output).split('\n', maxsplit=1)[0]))
 
             # 检查uwsgi是否在运行算法
             output, error = execute_command(ssh, check_uwsgi_command)

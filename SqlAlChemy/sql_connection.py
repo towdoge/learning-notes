@@ -7,8 +7,8 @@ class SqlConnection:
     def __init__(self):
         self.host = "10.7.71.112"
         self.port = 3306
-        self.user_name = "root"
-        self.password = "root"
+        self.user_name = "xx"
+        self.password = "xx"
         self.database = "sqlalchemy"
         self.charset = "utf8"
 

@@ -3,8 +3,8 @@ import os
 
 # 设置远程服务器的IP地址、用户名和密码
 hostname = "10.7.71.112"
-username = "root"
-password = "root"
+username = "1"
+password = "1"
 
 # 创建一个SSH客户端连接
 ssh = paramiko.SSHClient()
@@ -15,7 +15,7 @@ ssh.connect(hostname, username=username, password=password)
 remote_folder = "/path/to/remote/folder"
 
 # 本地文件夹路径
-local_folder = "C:/Users/xiaonan/Desktop/"
+local_folder = "C:/Users/xx/Desktop/"
 
 # 使用sftp客户端连接到远程服务器
 sftp = ssh.open_sftp()

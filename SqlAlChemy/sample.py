@@ -6,7 +6,7 @@ set_config = {
     "analysisId": "6bc220e3c19f4f5c982499f3313ef862",
     "dispatchIp": "10.7.71.112",
     "dispatchPort": "7399",
-    "dispatchWorkSpace": "/opt/workdir/atl",
+    "dispatchWorkSpace": "/opt/workdir",
 }
 
 sql_reading = SqlReading(set_config)
