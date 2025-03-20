@@ -48,7 +48,7 @@ def get_lines_for_all_files(work_dir):
 
 
 if __name__ == "__main__":
-    work_dir = "D:\\git\\test"
+    work_dir = "D:\\project\\git\\xxx"
     get_lines_for_all_files(work_dir)
     if not df_list:
         print("no py file or no function")

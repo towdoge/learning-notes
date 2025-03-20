@@ -21,5 +21,24 @@ print(work_dir)
 print(file_name)
 
 model = gb.gurobi.read(file_name)
-mp = model.presolve()
-mp.write("presolved.lp")
+
+# 记录所有变量和约束的信息
+vars_info = {v.VarName: v for v in model.getVars()}
+cons_info = {c.ConstrName: c for c in model.getConstrs()}
+
+presolved_model = model.presolve()
+
+prev_vars_info = {v.VarName: v for v in presolved_model.getVars()}
+prev_cons_info = {c.ConstrName: c for c in presolved_model.getConstrs()}
+
+# 检查哪些变量被删除
+removed_vars = [v.VarName for k, v in vars_info.items() if k not in prev_vars_info]
+print('Removed variables:', removed_vars)
+
+# 检查哪些约束被删除
+removed_cons = [c.ConstrName for k, c in cons_info.items() if k not in prev_cons_info]
+print('Removed constraints:', removed_cons)
+
+presolved_model.write("presolved.lp")
+model.optimize()
+# model.write("model.lp")

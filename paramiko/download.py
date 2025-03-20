@@ -2,7 +2,7 @@ import paramiko
 import os
 
 # 设置远程服务器的IP地址、用户名和密码
-hostname = "10.7.71.112"
+hostname = "1.1.1.1"
 username = "1"
 password = "1"
 

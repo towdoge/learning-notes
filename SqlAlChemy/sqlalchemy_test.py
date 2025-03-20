@@ -159,13 +159,13 @@ with get_session() as session:
 # query.filter(User.name.is_not(None))
 #
 # # and
-# from sqlalchemy import and_
+# from sqlalchemy import_test and_
 # query.filter(and_(User.name == 'ed', User.fullname == 'Ed Jones'))
 # query.filter(User.name == 'ed', User.fullname == 'Ed Jones')
 # query.filter(User.name == 'ed').filter(User.fullname == 'Ed Jones')
 #
 # # or
-# from sqlalchemy import or_
+# from sqlalchemy import_test or_
 # query.filter(or_(User.name == 'ed', User.name == 'wendy'))
 #
 # # match
